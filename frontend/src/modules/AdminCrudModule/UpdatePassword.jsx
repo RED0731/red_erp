@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { crud } from '@/redux/crud/actions';
@@ -11,7 +11,10 @@ import Loading from '@/components/Loading';
 import useOnFetch from '@/hooks/useOnFetch';
 import { request } from '@/request';
 
+import useLanguage from '@/locale/useLanguage';
+
 export default function UpdatePassword({ config }) {
+  const translate = useLanguage();
   const dispatch = useDispatch();
   const { current } = useSelector(selectUpdatedItem);
 
@@ -23,10 +26,11 @@ export default function UpdatePassword({ config }) {
 
   const handelSubmit = (fieldsValue) => {
     const entity = 'admin/password-update/' + current._id;
-    const updateFn = () => {
-      return request.patch({ entity, jsonData: fieldsValue });
+    const updateFn = async () => {
+      return await request.patch({ entity, jsonData: fieldsValue });
     };
-    onFetch(updateFn);
+    const callback = updateFn();
+    onFetch(callback);
   };
 
   /////
@@ -52,17 +56,16 @@ export default function UpdatePassword({ config }) {
   return (
     <div style={show}>
       <Loading isLoading={isLoading}>
-        <h3>Update Password</h3>
+        <h3>{translate('Update Password')}</h3>
         <div className="space10"></div>
         <Form form={form} layout="vertical" onFinish={handelSubmit}>
           <Form.Item
-            label="New Password"
+            label={translate('New Password')}
             name="password"
             rules={[
               {
                 required: true,
-                message: 'Please input your Password!',
-                len: 8,
+                // len: 8,
               },
             ]}
           >
@@ -75,7 +78,7 @@ export default function UpdatePassword({ config }) {
             }}
           >
             <Button type="primary" htmlType="submit">
-              Save
+              {translate('Save')}
             </Button>
           </Form.Item>
           <Form.Item
@@ -84,7 +87,7 @@ export default function UpdatePassword({ config }) {
               paddingLeft: '5px',
             }}
           >
-            <Button onClick={showCurrentRecord}>Cancel</Button>
+            <Button onClick={showCurrentRecord}>{translate('Cancel')}</Button>
           </Form.Item>
         </Form>
       </Loading>

@@ -1,5 +1,5 @@
 import { Form, InputNumber } from 'antd';
-import { useMoney } from '@/settings';
+import { useMoney, useDate } from '@/settings';
 
 export default function MoneyInputFormItem({ updatePrice, value = 0, readOnly = false }) {
   const money = useMoney();
@@ -10,11 +10,11 @@ export default function MoneyInputFormItem({ updatePrice, value = 0, readOnly = 
         readOnly={readOnly}
         className="moneyInput"
         onChange={updatePrice}
-        value={value}
+        precision={money.cent_precision ? money.cent_precision : 2}
+        value={money.amountFormatter({ amount: value })}
         controls={false}
-        addonAfter={money.currencyPosition === 'after' ? money.currencySymbol : undefined}
-        addonBefore={money.currencyPosition === 'before' ? money.currencySymbol : undefined}
-        formatter={(value) => money.amountFormatter({ amount: value })}
+        addonAfter={money.currency_position === 'after' ? money.currency_symbol : undefined}
+        addonBefore={money.currency_position === 'before' ? money.currency_symbol : undefined}
       />
     </Form.Item>
   );

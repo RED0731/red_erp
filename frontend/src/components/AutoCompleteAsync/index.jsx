@@ -1,8 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
+
 import { request } from '@/request';
 import useOnFetch from '@/hooks/useOnFetch';
-import { useDebounce } from 'react-use';
-import { Select } from 'antd';
+import useDebounce from '@/hooks/useDebounce';
+
+import { Select, Empty } from 'antd';
 
 export default function AutoCompleteAsync({
   entity,
@@ -32,8 +34,8 @@ export default function AutoCompleteAsync({
     [valToSearch]
   );
 
-  const asyncSearch = (options) => {
-    return request.search({ entity, options });
+  const asyncSearch = async (options) => {
+    return await request.search({ entity, options });
   };
 
   let { onFetch, result, isSuccess, isLoading } = useOnFetch();
@@ -48,7 +50,8 @@ export default function AutoCompleteAsync({
         q: debouncedValue,
         fields: searchFields,
       };
-      onFetch(() => asyncSearch(options));
+      const callback = asyncSearch(options);
+      onFetch(callback);
     }
 
     return () => {
@@ -96,15 +99,19 @@ export default function AutoCompleteAsync({
       allowClear
       placeholder={'Search Here'}
       defaultActiveFirstOption={false}
-      showArrow={false}
       filterOption={false}
-      notFoundContent={searching ? '... Searching' : 'Not Found'}
+      notFoundContent={searching ? '... Searching' : <Empty />}
       value={currentValue}
       onSearch={onSearch}
       onChange={(newValue) => {
         if (onChange) {
-          onChange(newValue[outputValue] || newValue);
+          if (newValue) onChange(newValue[outputValue] || newValue);
         }
+      }}
+      onClear={() => {
+        setOptions([]);
+        setCurrentValue(undefined);
+        setSearching(false);
       }}
     >
       {selectOptions.map((optionField) => (

@@ -9,10 +9,24 @@ axios.defaults.withCredentials = true;
 
 const request = {
   create: async ({ entity, jsonData }) => {
-    console.log('🚀 Create Request 🚀 ~ file: request.js ~ line 19 ~ create: ~ jsonData', jsonData);
-
     try {
       const response = await axios.post(entity + '/create', jsonData);
+      successHandler(response, {
+        notifyOnSuccess: true,
+        notifyOnFailed: true,
+      });
+      return response.data;
+    } catch (error) {
+      return errorHandler(error);
+    }
+  },
+  createAndUpload: async ({ entity, jsonData }) => {
+    try {
+      const response = await axios.post(entity + '/create', jsonData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
       successHandler(response, {
         notifyOnSuccess: true,
         notifyOnFailed: true,
@@ -35,9 +49,6 @@ const request = {
     }
   },
   update: async ({ entity, id, jsonData }) => {
-    console.log('🚀 ~ file: request.js ~ line 34 ~ update: ~ id', id);
-    console.log('🚀 Update Request 🚀 ~ file: request.js ~ line 42 ~ update: ~ jsonData', jsonData);
-
     try {
       const response = await axios.patch(entity + '/update/' + id, jsonData);
       successHandler(response, {
@@ -49,8 +60,24 @@ const request = {
       return errorHandler(error);
     }
   },
+  updateAndUpload: async ({ entity, id, jsonData }) => {
+    try {
+      const response = await axios.patch(entity + '/update/' + id, jsonData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      successHandler(response, {
+        notifyOnSuccess: true,
+        notifyOnFailed: true,
+      });
+      return response.data;
+    } catch (error) {
+      return errorHandler(error);
+    }
+  },
 
-  delete: async ({ entity, id, options = {} }) => {
+  delete: async ({ entity, id }) => {
     try {
       const response = await axios.delete(entity + '/delete/' + id);
       successHandler(response, {
@@ -119,8 +146,21 @@ const request = {
       return errorHandler(error);
     }
   },
+  listAll: async ({ entity }) => {
+    try {
+      const response = await axios.get(entity + '/listAll');
 
-  post: async ({ entity, jsonData, options = {} }) => {
+      successHandler(response, {
+        notifyOnSuccess: false,
+        notifyOnFailed: false,
+      });
+      return response.data;
+    } catch (error) {
+      return errorHandler(error);
+    }
+  },
+
+  post: async ({ entity, jsonData }) => {
     try {
       const response = await axios.post(entity, jsonData);
 
@@ -150,10 +190,68 @@ const request = {
     }
   },
 
+  upload: async ({ entity, id, jsonData }) => {
+    try {
+      const response = await axios.patch(entity + '/upload/' + id, jsonData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      successHandler(response, {
+        notifyOnSuccess: true,
+        notifyOnFailed: true,
+      });
+      return response.data;
+    } catch (error) {
+      return errorHandler(error);
+    }
+  },
+
   source: () => {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
     return source;
+  },
+
+  summary: async ({ entity }) => {
+    try {
+      const response = await axios.get(entity + '/summary');
+
+      successHandler(response, {
+        notifyOnSuccess: false,
+        notifyOnFailed: false,
+      });
+
+      return response.data;
+    } catch (error) {
+      return errorHandler(error);
+    }
+  },
+
+  mail: async ({ entity, jsonData }) => {
+    try {
+      const response = await axios.post(entity + '/mail/', jsonData);
+      successHandler(response, {
+        notifyOnSuccess: true,
+        notifyOnFailed: true,
+      });
+      return response.data;
+    } catch (error) {
+      return errorHandler(error);
+    }
+  },
+
+  convert: async ({ entity, id }) => {
+    try {
+      const response = await axios.get(`${entity}/convert/${id}`);
+      successHandler(response, {
+        notifyOnSuccess: true,
+        notifyOnFailed: true,
+      });
+      return response.data;
+    } catch (error) {
+      return errorHandler(error);
+    }
   },
 };
 export default request;
